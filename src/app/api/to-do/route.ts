@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"; // nextResponse ayuda a responder en json
 import { Task } from "../../../interfaces/taskInterfaces"
+
 export const taskList: Task[] = [
     {
         id: 1,
@@ -19,19 +20,19 @@ export const taskList: Task[] = [
 ];
 
 export async function GET(req: Request){
-    const url = new URL(req.url)
-    console.log(url)
-    const status = url.searchParams.get("status")
+    //const url = new URL(req.url)
+    //const status = url.searchParams.get("status")
 
-    let filterTask = taskList;
-    if(!status) return NextResponse.json(filterTask)
+    //let filterTask = taskList;
+    /* if(!status) return NextResponse.json(filterTask)
 
     if(status === "completed"){
         filterTask = taskList.filter(task => task.completed)
     }else{
         filterTask = taskList.filter(task =>!task.completed)
-    }
-    return NextResponse.json(filterTask)
+    } */
+    //console.log(filterTask)
+    return NextResponse.json({data: taskList, status: 200})
 }
 
 export async function POST(req: Request){
