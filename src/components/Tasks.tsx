@@ -49,18 +49,16 @@ const TasksCrud: React.FC = () => {
 
 
     const handleCreateTask = async (newTask: Task) => {
-
         try {
-
             const taskToSend = {
                 name: newTask.name,
                 date: newTask.date,
                 description: newTask.description,
-                completed: newTask.completed // Asignar solo el categoryId
+                completed: newTask.completed
             };
-
+    
             console.log('Tarea a enviar:', taskToSend);
-
+    
             // Hacer la solicitud al API
             const response = await fetch('/api/to-do', {
                 method: 'POST',
@@ -69,23 +67,23 @@ const TasksCrud: React.FC = () => {
                 },
                 body: JSON.stringify(taskToSend),
             });
-            console.log(response)
+    
             const responseData = await response.json();
-
-            console.log(responseData)
-
-            if (response.status === 201 && responseData.data) {
-                const createdTask: Task = responseData.data;
-                setTask(prev => [...prev, createdTask]); // Agregar el producto creado a la lista
-                return createdTask;
+    
+            // Acceder a la tarea creada dentro de responseData.data
+            if (response.status === 200 && responseData.data) {
+                const createdTask: Task = responseData.data; // Acceder a `data`
+                setTask(prev => [...prev, createdTask]); // Agregar la nueva tarea al estado
+                toast.success("Tarea creada exitosamente!");
+            } else {
+                toast.error(`Error al crear la tarea: ${responseData.message || 'Error desconocido'}`);
             }
-            toast.success("Tarea creada exitosamente!");
         } catch (error: unknown) {
             console.error('Error al enviar la tarea:', error);
             toast.error("Error al crear la tarea.");
         }
     };
-
+    
 
     const handleUpdateTask = async (updatedTask: Task) => {
 
@@ -124,6 +122,11 @@ const TasksCrud: React.FC = () => {
     };
 
     const handleDeleteTask = async (taskId: number) => {
+        const isConfirmed = confirm("¿Estás seguro de que deseas eliminar esta tarea?");
+    
+    if (!isConfirmed) {
+        return;
+    }
 
         try {
             const response = await fetch(`/api/to-do/${taskId}`, {
@@ -133,7 +136,7 @@ const TasksCrud: React.FC = () => {
                 },
             });
 
-            const responseData = await response.json(); // Cambiado a fetch
+            const responseData = await response.json(); 
 
             if (response.status === 200) {
                 setTask((prev) => prev.filter((task) => task.id !== taskId));
@@ -150,7 +153,6 @@ const TasksCrud: React.FC = () => {
 
     return (
         <>
-            <h2>Tasks</h2>
             <CreateForm
                 createData={handleCreateTask}
                 updateData={handleUpdateTask}

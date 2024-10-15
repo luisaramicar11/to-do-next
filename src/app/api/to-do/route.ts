@@ -1,25 +1,10 @@
 import { NextResponse } from "next/server"; // nextResponse ayuda a responder en json
+import { readTasksFromFile, writeTasksToFile } from './jsonHelpers';
 import { Task } from "../../../interfaces/taskInterfaces"
 
-export const taskList: Task[] = [
-    {
-        id: 1,
-        name: "Task 1",
-        date: "2022-12-25",
-        description: "This is the first task",
-        completed: false,
-    },
-    {
-        id: 2,
-        name: "Task 2",
-        date: "2022-12-25",
-        description: "This is the second task",
-        completed: true,
-    },
-
-];
 
 export async function GET(req: Request){
+    const tasks = await readTasksFromFile()
     //const url = new URL(req.url)
     //const status = url.searchParams.get("status")
 
@@ -32,7 +17,7 @@ export async function GET(req: Request){
         filterTask = taskList.filter(task =>!task.completed)
     } */
     //console.log(filterTask)
-    return NextResponse.json({data: taskList, status: 200})
+    return NextResponse.json({data: tasks, status: 200})
 }
 
 export async function POST(req: Request){
@@ -44,7 +29,7 @@ export async function POST(req: Request){
     }, {status: 500})
 
     if(!body.name ||!body.date ||!body.description) return NextResponse.json({message: "Missing required fields"}, {status: 400})
-
+       
     const newTask: Task = {
         id: Date.now(),
         completed: false,
@@ -53,7 +38,9 @@ export async function POST(req: Request){
         description: body.description,
     }
 
-    taskList.push(newTask)
-    return NextResponse.json(newTask)
+    const tasks = await readTasksFromFile(); 
+    tasks.push(newTask)
+    await writeTasksToFile(tasks)
+    return NextResponse.json({data: newTask, status: 201})
 }
 
